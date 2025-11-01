@@ -13,10 +13,12 @@ type RemoteData = {
 	NoVariables: boolean?
 }
 
+--// Modules
+local Sizeof = require("@lib/Sizeof")
+
 --// Module
 local Generation = {
 	DumpBaseName = "SigmaSpy-Dump %s.lua", -- "-- Generated with sigma spy BOIIIIIIIII (+9999999 AURA)\n"
-	Header = "-- Generated with Sigma Spy Github: https://github.com/depthso/Sigma-Spy\n",
 	ScriptTemplates = {
 		["Remote"] = {
 			{"%RemoteCall%"}
@@ -121,20 +123,15 @@ function Generation:SetSwapsCallback(Callback: (Interface: table) -> ())
 end
 
 function Generation:GetBase(Module): (string, boolean)
-	local NoComments = Flags:GetFlagValue("NoComments")
-	local Header = self.Header
-
-	local Code = NoComments and "" or Header
+	--local NoComments = Flags:GetFlagValue("NoComments")
 
 	--// Generate variables code
 	local Variables = Module.Parser:MakeVariableCode({
 		"Services", "Remote", "Variables"
-	}, NoComments)
+	}, true)
 
 	local NoVariables = Variables == ""
-	Code ..= Variables
-
-	return Code, NoVariables
+	return Variables, NoVariables
 end
 
 function Generation:GetSwaps()
@@ -313,6 +310,9 @@ function Generation:RemoteScript(Module, Data: RemoteData, ScriptType: string): 
 	local Method = Data.Method
 	local MetaMethod = Data.MetaMethod
 
+	--// Flags
+	local NoComments = Flags:GetFlagValue("NoComments")
+
 	--// Remote info
 	local ClassName = Hook:Index(Remote, "ClassName")
 	local IsNilParent = Hook:Index(Remote, "Parent") == nil
@@ -350,9 +350,18 @@ function Generation:RemoteScript(Module, Data: RemoteData, ScriptType: string): 
 		},
 		MetaMethod = MetaMethod
 	})
-	
+
 	--// Make code
-	local Code = self:GetBase(Module)
+	local Code = ""
+	if not NoComments then 
+		local Success, Bytes = pcall(Sizeof, Args)
+		local Count = Success and `{Bytes} bytes` or "FAILED!"
+		Code ..= `-- Remote packet size(~): {Count}\n\n`
+	end
+	
+	--// Compile base
+	Code ..= self:GetBase(Module)
+
 	return `{Code}\n{CallCode}`
 end
 

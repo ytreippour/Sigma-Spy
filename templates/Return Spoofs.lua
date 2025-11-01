@@ -7,10 +7,10 @@ return {
 	-- 	Method = "FireServer",
 	-- 	Return = {"Hello world from Sigma Spy!"}
 	-- }
-	-- [game.ReplicatedStorage.Remotes.DepsoIsCool] = {
+	-- [game.ReplicatedStorage.Remotes.some idiotIsCool] = {
 	-- 	Method = "FireServer",
 	-- 	Return = function(OriginalFunc, ...)
-	--		return {"Depso", "is awesome!"}
+	--		return {"some idiot", "is awesome!"}
 	-- end
 	-- }
 }

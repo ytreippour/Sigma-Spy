@@ -134,31 +134,31 @@ function Hook:PatchFunctions()
 	local Patches = {
 		--// Error detection patch
 		--// hookfunction may still be detected depending on the executor
-		[pcall] =  function(OldFunc, Func, ...)
-			local Responce = {OldFunc(Func, ...)}
-			local Success, Error = Responce[1], Responce[2]
-			local IsC = iscclosure(Func)
+		-- [pcall] =  function(OldFunc, Func, ...)
+		-- 	local Responce = {OldFunc(Func, ...)}
+		-- 	local Success, Error = Responce[1], Responce[2]
+		-- 	local IsC = iscclosure(Func)
 
-			--// Patch c-closure error detection
-			if Success == false and IsC then
-				local NewError = Process:CleanCError(Error)
-				Responce[2] = NewError
-			end
+		-- 	--// Patch c-closure error detection
+		-- 	if Success == false and IsC then
+		-- 		local NewError = Process:CleanCError(Error)
+		-- 		Responce[2] = NewError
+		-- 	end
 
-			--// Stack-overflow detection patch
-			if Success == false and not IsC and Error:find("C stack overflow") then
-				local Tracetable = Error:split(":")
-				local Caller, Line = Tracetable[1], Tracetable[2]
-				local Count = Process:CountMatches(Error, Caller)
+		-- 	--// Stack-overflow detection patch
+		-- 	if Success == false and not IsC and Error:find("C stack overflow") then
+		-- 		local Tracetable = Error:split(":")
+		-- 		local Caller, Line = Tracetable[1], Tracetable[2]
+		-- 		local Count = Process:CountMatches(Error, Caller)
 
-				if Count == 196 then
-					Communication:ConsolePrint(`C stack overflow patched, count was {Count}`)
-					Responce[2] = Error:gsub(`{Caller}:{Line}: `, Caller, 1)
-				end
-			end
+		-- 		if Count == 196 then
+		-- 			Communication:ConsolePrint(`C stack overflow patched, count was {Count}`)
+		-- 			Responce[2] = Error:gsub(`{Caller}:{Line}: `, Caller, 1)
+		-- 		end
+		-- 	end
 
-			return Responce
-		end,
+		-- 	return Responce
+		-- end,
 		[getfenv] = function(OldFunc, Level: number, ...)
 			Level = Level or 1
 
@@ -324,7 +324,6 @@ function Hook:BeginService(Libraries, ExtraData, ChannelId, ...)
 	local ReturnSpoofs = Libraries.ReturnSpoofs
 	local ProcessLib = Libraries.Process
 	local Communication = Libraries.Communication
-	local Generation = Libraries.Generation
 	local Config = Libraries.Config
 
 	--// Check for configuration overwrites
@@ -334,7 +333,6 @@ function Hook:BeginService(Libraries, ExtraData, ChannelId, ...)
 	local InitData = {
 		Modules = {
 			ReturnSpoofs = ReturnSpoofs,
-			Generation = Generation,
 			Communication = Communication,
 			Process = ProcessLib,
 			Config = Config,

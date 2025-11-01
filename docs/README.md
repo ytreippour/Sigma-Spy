@@ -7,7 +7,7 @@ A complete Remote Spy with an incredible parser that captures incoming and outgo
 
 ## Loadstring
 ```lua
---// Sigma Spy @depso
+--// Sigma Spy @some idiot
 loadstring(game:HttpGet("https://raw.githubusercontent.com/depthso/Sigma-Spy/refs/heads/main/Main.lua"))()
 ```
 
@@ -100,5 +100,5 @@ Your executor must support these functions in order for it to function:
 
 
 ## Libraries used
-- [ReGui (Depso)](https://github.com/depthso/Dear-ReGui/tree/main) 
-- [Roblox-Parser (Depso)](https://github.com/depthso/Roblox-parser) 
+- [ReGui (some idiot)](https://github.com/depthso/Dear-ReGui/tree/main) 
+- [Roblox-Parser (some idiot)](https://github.com/depthso/Roblox-parser) 

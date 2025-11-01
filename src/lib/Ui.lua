@@ -1,10 +1,5 @@
 local Ui = {
-	DefaultEditorContent = [=[--[[
-	Sigma Spy, written by depso
-	Hooks rewritten and many more fixes!
-
-	Discord: https://discord.gg/bkUkm2vSbv
-]]]=],
+	DefaultEditorContent = [[-- abandoned due to 14 year olds copying, i dont care if things dont work]],
 	LogLimit = 100,
     SeasonLabels = { 
         January = "⛄ %s ⛄", 
@@ -44,6 +39,7 @@ local Ui = {
     RandomSeed = Random.new(tick()),
 	Logs = setmetatable({}, {__mode = "k"}),
 	LogQueue = setmetatable({}, {__mode = "v"}),
+	FunctionCount = {}
 } 
 
 type table = {
@@ -126,6 +122,24 @@ end
 
 function Ui:SetClipboard(Content: string)
 	SetClipboard(Content)
+end
+
+function Ui:CopyFunction(RemoteName: string, Function)
+	local Counts = self.FunctionCount
+
+	--// Update count
+	local Count = (Counts[RemoteName] or 0) + 1
+	Counts[RemoteName] = Count
+
+	--// Variable
+	local Name = `{RemoteName}{Count}_CALLER`
+	shared[Name] = Function
+
+	self:SetClipboard(`shared.{Name}`)
+	self:ShowModal({
+		"Copied calling function into the global shared called:",
+		Name
+	})
 end
 
 function Ui:TurnSeasonal(Text: string): string
@@ -402,7 +416,7 @@ function Ui:DisplayAura()
     local AURADELAY = Rand:NextInteger(1, 5)
 
 	--// Title
-	local Title = `Sigma Spy | AURA: {AURA}`
+	local Title = `Your profit manual | AURA: -{AURA}`
 	local Seasonal = self:TurnSeasonal(Title)
     Window:SetTitle(Seasonal)
 
@@ -489,7 +503,7 @@ function Ui:ConsoleTab(InfoSelector)
 
 	--// Create console
 	Console = Tab:Console({
-		Text = "-- Created by depso",
+		Text = "-- Created by some idiot",
 		ReadOnly = true,
 		Border = false,
 		Fill = true,
@@ -585,9 +599,10 @@ function Ui:AddDetailsSection(OptionsTab)
 	OptionsTab:Separator({Text="Information"})
 	OptionsTab:BulletText({
 		Rows = {
-			"Sigma spy - Written by depso!",
+			"Sigma spy - Written by some idiot!",
 			"Libraries: Roblox-Parser, Dear-ReGui",
-			"Thank you syn.lua for suggesting I make this"
+			"Thank you syn.lua for your betrayal",
+			"Shoutout to msgay for copying everything and the execuses"
 		}
 	})
 end
@@ -612,9 +627,9 @@ function Ui:MakeEditorTab(InfoSelector)
 	local CodeEditor = EditorTab:CodeEditor({
 		Fill = true,
 		Editable = true,
-		FontSize = 13,
+		FontSize = 14,
 		Colors = SyntaxColors,
-		FontFace = TextFont,
+		--FontFace = TextFont,
 		Text = Default
 	})
 
@@ -880,6 +895,7 @@ function Ui:SetFocusedRemote(Data)
 	local ClassData = Data.ClassData
 	local HeaderData = Data.HeaderData
 	local ValueSwaps = Data.ValueSwaps
+	local CallingFunction = Data.CallingFunction
 	local Args = Data.Args
 	local Id = Data.Id
 
@@ -1097,6 +1113,12 @@ function Ui:SetFocusedRemote(Data)
 					local Method = ClassData.Receive[1]
 					local Signal = Remote[Method]
 					self:ViewConnections(RemoteName, Signal)
+				end,
+			},
+			{
+				Text = "Copy function",
+				Callback = function()
+					Ui:CopyFunction(RemoteName, CallingFunction)
 				end,
 			}
 		}
@@ -1334,7 +1356,7 @@ function Ui:CreateLog(Data: Log)
 	--// Unpack log data
     local Remote = Data.Remote
 	local Method = Data.Method
-    local Args = Data.Args
+    local Args = Data.Args -- Wow a citdal detection, fix the GC bomb depso the dumbass
     local IsReceive = Data.IsReceive
 	local Id = Data.Id
 	local Timestamp = Data.Timestamp
@@ -1370,7 +1392,7 @@ function Ui:CreateLog(Data: Log)
 
 	--// Deep clone data
 	local ClonedArgs = Process:DeepCloneTable(Args)
-	Data.Args = ClonedArgs
+	Data.Args = ClonedArgs -- W garbage collection 😂😂😂😂😂😂
 	Data.ValueSwaps = Generation:MakeValueSwapsTable(Timestamp)
 
 	--// Generate log title

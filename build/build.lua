@@ -20,6 +20,32 @@ local function GetTagPath(Tag: string, Path: string): string
     return Path:gsub(Tag, TagPath)
 end
 
+local function DarkluaBuild(Path: string): string
+    local TempFile = `{Path}.tmp`
+
+    local DarkLuaResponce = process.exec("darklua", {
+        "process",
+        Path,
+        TempFile,
+        "-c",
+        DarkluaConfig,
+    })
+
+    --// Print error message
+    if not DarkLuaResponce.ok then
+        warn(DarkLuaResponce.stderr)
+        return fs.readFile(Path)
+    end
+
+    --// Read
+    local Contents = fs.readFile(TempFile)
+
+    --// Remove
+    fs.removeFile(TempFile)
+
+    return Contents
+end
+
 --// Good enough
 local function GetPath(Path: string): string
     local IsTag = Path:sub(1,1) == "@"
@@ -39,7 +65,7 @@ local function ReplaceCompiles(Content: string): string
         local PathReference = String:match('%s*COMPILE:%s*(@[^"]+)')
         local Path = GetPath(PathReference)
 
-        local Contents = fs.readFile(Path)
+        local Contents = DarkluaBuild(Path)
         local ContentBuffer = buffer.fromstring(Contents)
         local Replacement = Base64:Encode(ContentBuffer)
 
@@ -73,22 +99,8 @@ local Processed = ReplaceCompiles(MainFile)
 Processed = ReplaceInserts(Processed)
 fs.writeFile(OutputFile, Processed)
 
-local DarkLuaResponce = process.exec("darklua", {
-	"process",
-	OutputFile,
-	OutputFile,
-	"-c",
-	DarkluaConfig,
-})
-
---// Print error message
-if not DarkLuaResponce.ok then
-	print(DarkLuaResponce.stderr)
-	return
-end
-
 local Compiled = Frame
-local DarkluaOut = fs.readFile(OutputFile)
+local DarkluaOut = DarkluaBuild(OutputFile)
 Compiled ..= `\n{DarkluaOut}`
 
 fs.writeFile(OutputFile, Compiled)

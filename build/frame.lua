@@ -11,7 +11,7 @@
 	⣿⣿⣟⣁⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀
 	⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 
-	@author depso (depthso)
+	@author some idiot (depthso)
 	@repo https://github.com/depthso
 	@license MIT
 	@description Sigma Remote Spy for Roblox
